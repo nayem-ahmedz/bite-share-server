@@ -30,14 +30,14 @@ const verifyFirebaseToken = async (req, res, next) => {
   }
   const token = authHeader.split(' ')[1];
   if (!token) {
-    return res.status(401).send({ message: 'unauthorized access, no token' });
+    return res.status(401).send({ message: 'unauthorized access' });
   }
   try {
     const userInfo = await admin.auth().verifyIdToken(token);
     req.tokenEmail = userInfo.email;
     next();
   } catch (error) {
-    return res.status(401).send({ message: 'unauthorized access, invalid token' });
+    return res.status(401).send({ message: 'unauthorized access' });
   }
 }
 
@@ -64,6 +64,7 @@ async function run() {
     // db connection
     const db = client.db('bite_share');
     const users = db.collection('users');
+    const foods = db.collection('foods');
 
     // users API
     app.post('/users', verifyFirebaseToken, async (req, res) => {
@@ -73,12 +74,32 @@ async function run() {
         const found = await users.findOne(query);
         if (!found) {
           const result = await users.insertOne(newUser);
-          return res.send(result);
+          return res.status(201).send(result);
         }
         res.send({ message: 'user already exist!' });
       } else {
         res.status(403).send({ message: 'forbidden access' });
       }
+    });
+
+    // foods api
+    // save a food
+    app.post('/foods', verifyFirebaseToken, async(req, res) => {
+      const newFood = req.body;
+      if(req.body.email !== req.tokenEmail){
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+      const existing = await foods.findOne({
+        email: newFood.email,
+        foodName: newFood.foodName,
+        pickupLocation: newFood.pickupLocation,
+        foodQuantity: newFood.foodQuantity
+      });
+      if(existing){
+        return res.status(409).json({ message: 'Food already added once!' });
+      }
+      const result = await foods.insertOne(newFood);
+      res.status(201).send(result);
     });
 
     // Send a ping to confirm a successful connection
