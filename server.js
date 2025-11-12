@@ -4,8 +4,13 @@ require('dotenv').config()
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const admin = require("firebase-admin");
-const serviceAccount = require('./firebase-adminsdk.json');
+// const serviceAccount = require('./firebase-adminsdk.json');
 const port = process.env.PORT || 3000;
+
+// for deployment
+// index.js
+const decoded = Buffer.from(process.env.FIREBASE_SERVICE_KEY, "base64").toString("utf8");
+const serviceAccount = JSON.parse(decoded);
 
 // firebase admin sdk
 admin.initializeApp({
@@ -15,7 +20,8 @@ admin.initializeApp({
 // middlewares
 // cors setup
 const allowedOrigins = [
-  'http://localhost:5173'
+  // 'http://localhost:5173',
+  'https://bite-sharee.vercel.app/'
 ]
 app.use(cors({
   origin: allowedOrigins
@@ -126,11 +132,11 @@ async function run() {
     });
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    // await client.close();
+    await client.close();
   }
 }
 run().catch(console.dir);
