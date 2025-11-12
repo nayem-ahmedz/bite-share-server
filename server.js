@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config()
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const admin = require("firebase-admin");
 const serviceAccount = require('./firebase-adminsdk.json');
 const port = process.env.PORT || 3000;
@@ -83,6 +83,29 @@ async function run() {
     });
 
     // foods api
+    // get all food
+    app.get('/foods', async(req, res) => {
+      const query = { foodStatus: 'Available' };
+      const cursor = foods.find(query);
+      const allValues = await cursor.toArray();
+      res.send(allValues);
+    });
+    // get single food
+    app.get('/foods/:id', async(req, res) => {
+      const foodId = req.params.id;
+      const query = { _id: new ObjectId(foodId) };
+      const result = await foods.findOne(query);
+      res.send(result);
+    });
+    // get featured food
+    app.get('/featured-foods', async(req, res) => {
+      const cursor = foods
+        .find({ foodStatus: 'Available' })
+        .sort({ foodQuantity: -1 })
+        .limit(6);
+      const featured = await cursor.toArray();
+      res.send(featured);
+    });
     // save a food
     app.post('/foods', verifyFirebaseToken, async(req, res) => {
       const newFood = req.body;
