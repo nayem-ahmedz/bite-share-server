@@ -3,22 +3,47 @@ const app = express();
 require('dotenv').config()
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const admin = require("firebase-admin");
+const serviceAccount = require('./firebase-adminsdk.json');
 const port = process.env.PORT || 3000;
+
+// firebase admin sdk
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 // middlewares
 // cors setup
 const allowedOrigins = [
-    'http://localhost:5173'
+  'http://localhost:5173'
 ]
 app.use(cors({
-    origin: allowedOrigins
+  origin: allowedOrigins
 }));
 // method to get json body
 app.use(express.json());
+// verify firebase token
+const verifyFirebaseToken = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({ message: 'unauthorized access' });
+  }
+  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(401).send({ message: 'unauthorized access, no token' });
+  }
+  try {
+    const userInfo = await admin.auth().verifyIdToken(token);
+    req.tokenEmail = userInfo.email;
+    next();
+  } catch (error) {
+    return res.status(401).send({ message: 'unauthorized access, invalid token' });
+  }
+}
 
 // test api
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+  res.send('Hello World!');
 });
 
 // mongodb driver setup
@@ -41,15 +66,19 @@ async function run() {
     const users = db.collection('users');
 
     // users API
-    app.post('/users', async(req, res) => {
-        const newUser = req.body;
-        const query = {email: newUser.email};
+    app.post('/users', verifyFirebaseToken, async (req, res) => {
+      const newUser = req.body;
+      const query = { email: newUser.email };
+      if (req.body.email === req.tokenEmail) {
         const found = await users.findOne(query);
-        if(!found){
-            const result = await users.insertOne(newUser);
-            return res.send(result);
+        if (!found) {
+          const result = await users.insertOne(newUser);
+          return res.send(result);
         }
-        res.send({message: 'user already exist!'});
+        res.send({ message: 'user already exist!' });
+      } else {
+        res.status(403).send({ message: 'forbidden access' });
+      }
     });
 
     // Send a ping to confirm a successful connection
@@ -64,5 +93,5 @@ run().catch(console.dir);
 
 
 app.listen(port, () => {
-    console.log(`bite share server is running on port ${port}`);
+  console.log(`bite share server is running on port ${port}`);
 });
