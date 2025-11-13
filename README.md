@@ -26,8 +26,8 @@ Complete Web Development by Programming Hero | Batch 12
 
 ## Project Timeline
 - created on 10 Nov 2025
-- completed on -- 2025
-- last updated on -- 2025
+- completed on 13 Nov 2025
+- last updated on 13 Nov 2025
 
 ## live link
 coming soon

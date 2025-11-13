@@ -20,7 +20,7 @@ admin.initializeApp({
 // middlewares
 // cors setup
 const allowedOrigins = [
-  'http://localhost:5173',
+  // 'http://localhost:5173',
   'https://bite-sharee.vercel.app'
 ]
 app.use(cors({
@@ -74,6 +74,7 @@ async function run() {
     const db = client.db('bite_share');
     const users = db.collection('users');
     const foods = db.collection('foods');
+    const foodRequests = db.collection('foodsRequests');
 
     // users API
     app.post('/users', verifyFirebaseToken, async (req, res) => {
@@ -93,21 +94,21 @@ async function run() {
 
     // foods api
     // get all food
-    app.get('/foods', async(req, res) => {
+    app.get('/foods', async (req, res) => {
       const query = { foodStatus: 'Available' };
       const cursor = foods.find(query);
       const allValues = await cursor.toArray();
       res.send(allValues);
     });
     // get single food
-    app.get('/foods/:id', async(req, res) => {
+    app.get('/foods/:id', async (req, res) => {
       const foodId = req.params.id;
       const query = { _id: new ObjectId(foodId) };
       const result = await foods.findOne(query);
       res.send(result);
     });
     // get featured food
-    app.get('/featured-foods', async(req, res) => {
+    app.get('/featured-foods', async (req, res) => {
       const cursor = foods
         .find({ foodStatus: 'Available' })
         .sort({ foodQuantity: -1 })
@@ -116,9 +117,9 @@ async function run() {
       res.send(featured);
     });
     // save a food
-    app.post('/foods', verifyFirebaseToken, async(req, res) => {
+    app.post('/foods', verifyFirebaseToken, async (req, res) => {
       const newFood = req.body;
-      if(req.body.email !== req.tokenEmail){
+      if (req.body.email !== req.tokenEmail) {
         return res.status(403).send({ message: 'forbidden access' });
       }
       const existing = await foods.findOne({
@@ -127,7 +128,7 @@ async function run() {
         pickupLocation: newFood.pickupLocation,
         foodQuantity: newFood.foodQuantity
       });
-      if(existing){
+      if (existing) {
         return res.status(409).json({ message: 'Food already added once!' });
       }
       const result = await foods.insertOne(newFood);
@@ -135,21 +136,21 @@ async function run() {
     });
 
     // get all food of a specific user
-    app.get('/my-food', verifyFirebaseToken, async(req, res) => {
+    app.get('/my-food', verifyFirebaseToken, async (req, res) => {
       const userMail = req.query.email;
-      if(userMail !== req.tokenEmail){
+      if (userMail !== req.tokenEmail) {
         return res.status(403).send({ message: 'forbidden access' });
       }
-      const cursor = foods.find({email: userMail});
+      const cursor = foods.find({ email: userMail });
       const allValues = await cursor.toArray();
       res.send(allValues);
     });
 
     // update food info
-    app.patch('/foods/:id', verifyFirebaseToken, async(req, res) => {
+    app.patch('/foods/:id', verifyFirebaseToken, async (req, res) => {
       const id = req.params.id;
       const updatedInfo = req.body;
-      if(updatedInfo.email !== req.tokenEmail){
+      if (updatedInfo.email !== req.tokenEmail) {
         return res.status(403).send({ message: 'forbidden access' });
       }
       const updates = {
@@ -170,15 +171,35 @@ async function run() {
     });
 
     // delete a food
-    app.delete('/foods/:id', verifyFirebaseToken, async(req, res) => {
+    app.delete('/foods/:id', verifyFirebaseToken, async (req, res) => {
       const id = req.params.id;
-      if(req.query.email !== req.tokenEmail){
+      if (req.query.email !== req.tokenEmail) {
         return res.status(403).send({ message: 'forbidden access' });
       }
-      const query = {_id: new ObjectId(id), email: req.tokenEmail};
+      const query = { _id: new ObjectId(id), email: req.tokenEmail };
       const result = await foods.deleteOne(query);
       res.send(result);
     });
+
+    // save a food request
+    app.post('/food-requests', verifyFirebaseToken, async (req, res) => {
+      const newRequest = req.body;
+      if (req.tokenEmail !== newRequest.userEmail) {
+        return res.status(403).send({ message: 'Forbidden access' });
+      }
+      const existing = await foodRequests.findOne({
+        foodId: newRequest.foodId,
+        userEmail: newRequest.userEmail
+      });
+      if (existing) {
+        return res.status(409).json({ message: 'You already submitted a request for this food!' });
+      }
+      newRequest.status = 'pending';
+      newRequest.createdAt = new Date();
+      const result = await foodRequests.insertOne(newRequest);
+      res.status(201).send(result);
+    });
+
 
 
     // Send a ping to confirm a successful connection
