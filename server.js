@@ -28,6 +28,8 @@ app.use(cors({
 }));
 // method to get json body
 app.use(express.json());
+
+
 // verify firebase token
 const verifyFirebaseToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -142,6 +144,42 @@ async function run() {
       const allValues = await cursor.toArray();
       res.send(allValues);
     });
+
+    // update food info
+    app.patch('/foods/:id', verifyFirebaseToken, async(req, res) => {
+      const id = req.params.id;
+      const updatedInfo = req.body;
+      if(updatedInfo.email !== req.tokenEmail){
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+      const updates = {
+        $set: {
+          foodName: updatedInfo.foodName,
+          foodQuantity: updatedInfo.foodQuantity,
+          pickupLocation: updatedInfo.pickupLocation,
+          expireDate: updatedInfo.expireDate,
+          notes: updatedInfo.notes,
+          imageUrl: updatedInfo.imageUrl,
+          foodStatus: updatedInfo.foodStatus,
+        }
+      };
+      const query = { _id: new ObjectId(id), email: req.tokenEmail };
+      const result = await foods.updateOne(query, updates);
+      // console.log(result);
+      res.send(result);
+    });
+
+    // delete a food
+    app.delete('/foods/:id', verifyFirebaseToken, async(req, res) => {
+      const id = req.params.id;
+      if(req.query.email !== req.tokenEmail){
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+      const query = {_id: new ObjectId(id), email: req.tokenEmail};
+      const result = await foods.deleteOne(query);
+      res.send(result);
+    });
+
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
