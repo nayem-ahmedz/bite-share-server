@@ -20,7 +20,7 @@ admin.initializeApp({
 // middlewares
 // cors setup
 const allowedOrigins = [
-  // 'http://localhost:5173',
+  'http://localhost:5173',
   'https://bite-sharee.vercel.app'
 ]
 app.use(cors({
