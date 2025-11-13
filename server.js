@@ -132,6 +132,17 @@ async function run() {
       res.status(201).send(result);
     });
 
+    // get all food of a specific user
+    app.get('/my-food', verifyFirebaseToken, async(req, res) => {
+      const userMail = req.query.email;
+      if(userMail !== req.tokenEmail){
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+      const cursor = foods.find({email: userMail});
+      const allValues = await cursor.toArray();
+      res.send(allValues);
+    });
+
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
