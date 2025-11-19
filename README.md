@@ -32,7 +32,7 @@ Share your vite with others
 ## Installation / Running Locally
 1. Clone the repository:
    ```bash
-   git clone git@github.com:nayem-ahmedz/bite-share-server.git
+   git clone https://github.com/nayem-ahmedz/bite-share-server.git
    ```
 2. Navigate to the project folder:
    ```bash
