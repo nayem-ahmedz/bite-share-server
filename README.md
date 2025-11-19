@@ -48,6 +48,7 @@ Share your vite with others
    ```
 
 ## live link
-[Server Link](https://bite-share-server.vercel.app/)
+- [Front-end](https://bite-sharee.vercel.app/)
+- [Server](https://bite-share-server.vercel.app/)
 
 Feel free to contact for any query!
