@@ -36,7 +36,7 @@ Share your vite with others
    ```
 2. Navigate to the project folder:
    ```bash
-   cd bite-share
+   cd bite-share-server
    ```
 3. Install dependencies:
    ```bash
