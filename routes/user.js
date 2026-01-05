@@ -12,7 +12,7 @@ router.post('/', verifyFirebaseToken, async (req, res) => {
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({
+            return res.status(200).json({
                 success: false,
                 message: "User with this email already exists"
             });

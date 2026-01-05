@@ -4,6 +4,7 @@ const cors = require('cors');
 
 // importing routes
 const userRoutes = require('./routes/user');
+const foodRoutes = require('./routes/food');
 
 // middlewares
 // cors setup
@@ -24,5 +25,6 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/user', userRoutes);
+app.use('/api/food', foodRoutes);
 
 module.exports = app;
