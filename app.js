@@ -6,17 +6,19 @@ const cors = require('cors');
 const userRoutes = require('./routes/user');
 const foodRoutes = require('./routes/food');
 
-// middleware
+// Middleware
+// CORS for normal requests
 const corsOption = {
-  origin: process.env.FRONTEND_LINK
-}
+  origin: process.env.FRONTEND_LINK,
+  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"]
+};
 app.use(cors(corsOption));
 // method to get json body
 app.use(express.json());
 
 // default endpoint
 app.get('/', (req, res) => {
-  res.json({ status: true, message: 'Welcome to Bite Share server', corsOption });
+  res.json({ status: true, message: 'Welcome to Bite Share server'});
 });
 
 // Routes
