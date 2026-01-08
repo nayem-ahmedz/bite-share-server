@@ -20,7 +20,7 @@ app.use(express.json());
 
 // default endpoint
 app.get('/', (req, res) => {
-  res.json({status: true, message: 'Bite share server is running'});
+  res.json({status: true, message: 'Bite share server is running smoothly'});
 });
 
 // Routes
