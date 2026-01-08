@@ -6,21 +6,17 @@ const cors = require('cors');
 const userRoutes = require('./routes/user');
 const foodRoutes = require('./routes/food');
 
-// middlewares
-// cors setup
-const allowedOrigins = [
-  process.env.FRONTEND_LINK
-]
-app.use(cors({
-  origin: allowedOrigins
-}));
-
+// middleware
+const corsOption = {
+  origin: process.env.FRONTEND_LINK
+}
+app.use(cors(corsOption));
 // method to get json body
 app.use(express.json());
 
 // default endpoint
 app.get('/', (req, res) => {
-  res.json({status: true, message: 'Bite share server is running smoothly'});
+  res.json({ status: true, message: 'Welcome to Bite Share server' });
 });
 
 // Routes
