@@ -16,7 +16,7 @@ app.use(express.json());
 
 // default endpoint
 app.get('/', (req, res) => {
-  res.json({ status: true, message: process.env.FRONTEND_LINK });
+  res.json({ status: true, message: 'Welcome to Bite Share server' });
 });
 
 // Routes
