@@ -9,12 +9,8 @@ const foodRoutes = require('./routes/food');
 // Middleware
 // CORS for normal requests
 const corsOptions = {
-  origin: process.env.FRONTEND_LINK,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 204
+  origin: process.env.FRONTEND_LINK
 };
-
 app.use(cors(corsOptions));
 // method to get json body
 app.use(express.json());

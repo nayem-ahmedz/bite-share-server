@@ -1,6 +1,5 @@
-// api/index.js
-const app = require("../app");
-const connectDB = require("../config/connectDB");
+const app = require("./src/app");
+const connectDB = require("./src/config/connectDB");
 
 // Serverless function wrapper
 module.exports = async (req, res) => {
