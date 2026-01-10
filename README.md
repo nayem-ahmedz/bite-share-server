@@ -22,7 +22,6 @@ Share your bite (food) with others
 
 
 ## API Documentation
-All protected routes require the `token` HttpOnly cookie. Frontend requests must use `withCredentials: true`.
 
 ---
 
