@@ -41,7 +41,7 @@ router.post('/', verifyFirebaseToken, async (req, res) => {
 router.get('/role', verifyFirebaseToken, async(req, res) => {
     const email = req.query.email;
     if(email !== req.tokenEmail){
-        res.status(403).json({message: 'forbidden access'});
+        return res.status(403).json({message: 'forbidden access'});
     }
     const user = await User.findOne({email: req.tokenEmail}).select('-__v');
     res.json({
@@ -54,7 +54,7 @@ router.get('/role', verifyFirebaseToken, async(req, res) => {
 router.get('/profile', verifyFirebaseToken, async(req, res) => {
     const email = req.query.email;
     if(email !== req.tokenEmail){
-        res.status(403).json({message: 'forbidden access'});
+        return res.status(403).json({message: 'forbidden access'});
     }
     const user = await User.findOne({email: req.tokenEmail}).select('-__v');
     res.json({
